@@ -10,11 +10,16 @@ class Receiver:
         self.timeout = timeout_in_second
         self.on_message_arrived = on_message_arrived
         self.time_between_retries = time_between_retries
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.settimeout(timeout_in_second)
+        self.socket = None
 
     def connect(self):
-        self.socket.connect((self.address, self.port))
+        try:
+            self.socket = socket.create_connection((self.address, self.port), self.time_between_retries)
+        except Exception as e:
+            print(e)
+            print("Failed to connect to server. waiting %s seconds and trying again" % self.time_between_retries)
+            time.sleep(self.time_between_retries)
+            self.connect()
 
     def disconnect(self):
         self.socket.close()
@@ -33,11 +38,11 @@ class Receiver:
 
     def receive_from_socket(self, buffer_size):
         try:
-            data = self.socket.recv(buffer_size)
+            return self.socket.recv(buffer_size)
         except socket.timeout:
-            print('Didnt get data for '+str(self.timeout)+' trying to reconnect')
-            time.sleep(self.time_between_retries)
-            self.disconnect()
-            self.connect()
-            self.receive_from_socket(buffer_size)
-        return data
+            pass
+        print("Didnt get data for %s seconds trying to reconnect" % str(self.timeout))
+        time.sleep(self.time_between_retries)
+        self.disconnect()
+        self.connect()
+        return self.receive_from_socket(buffer_size)
