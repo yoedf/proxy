@@ -9,5 +9,5 @@ class Sender(object):
 
     def send_message(self, message):
         print(message)
-        response = requests.put(("%s:%s/%s" % self.server_ip, str(self.server_port), self.page_name), data=message)
+        response = requests.put("%s:%s/%s" % (self.server_ip, str(self.server_port), self.page_name), data=message)
         print(response)
