@@ -11,7 +11,8 @@ class Sender(object):
     def send_message(self, message):
         print(message)
         try:
+            headers = {'Content-Type': 'text/xml'}
             response = requests.put("%s:%s/%s" % (self.server_ip, str(self.server_port), self.page_name), data=message,
-                                    timeout=self.timeout)
+                                    timeout=self.timeout, headers=headers)
         except Exception:
             pass
