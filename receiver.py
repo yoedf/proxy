@@ -38,10 +38,12 @@ class Receiver:
 
     def receive_from_socket(self, buffer_size):
         try:
-            return self.socket.recv(buffer_size)
+            buffer = self.socket.recv(buffer_size)
+            if buffer:
+                return buffer
         except socket.timeout:
             pass
-        print("Didnt get data for %s seconds trying to reconnect" % str(self.timeout))
+        print("Didnt get data for %s seconds trying to reconnect" % str(self.time_between_retries))
         time.sleep(self.time_between_retries)
         self.disconnect()
         self.connect()
